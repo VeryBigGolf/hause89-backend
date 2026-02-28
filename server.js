@@ -33,7 +33,8 @@ app.use(xss());
 app.use(cors());
 
 const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 mins
+  // 5 mins / 100 requests
+  windowMs: 5 * 60 * 1000,
   max: 100,
 });
 app.use(limiter);
