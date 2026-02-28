@@ -98,27 +98,6 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
-    // Assume same date but different time
-    if (req.body.apptDate) {
-      const reqDate = new Date(req.body.apptDate);
-      const open = shop.openTime;
-      const close = shop.closeTime;
-
-      let isClosed = false;
-      if (open < close) {
-        isClosed = reqDate < open || reqDate > close;
-      } else {
-        isClosed = reqDate < open && reqDate > close;
-      }
-
-      if (isClosed) {
-        return res.status(400).json({
-          succes: false,
-          message: "the apptDate is not in the massage shop working hours",
-        });
-      }
-    }
-
     const appointment = await Appointment.create(req.body);
 
     return res.status(200).json({
@@ -140,6 +119,13 @@ exports.updateAppointment = async (req, res, next) => {
   try {
     let appointment = await Appointment.findById(req.params.id);
 
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointment with the id of ${req.params.id}`,
+      });
+    }
+
     if (
       appointment.user.toString() !== req.user.id &&
       req.user.role !== "admin"
@@ -148,34 +134,6 @@ exports.updateAppointment = async (req, res, next) => {
         success: false,
         message: `User ${req.user.id} is not authorized to update this appointment`,
       });
-    }
-
-    if (!appointment) {
-      return res.status(404).json({
-        success: false,
-        message: `No appointment with the id of ${req.params.id}`,
-      });
-    }
-
-    // Assume same date but different time
-    if (req.body.apptDate) {
-      const reqDate = new Date(req.body.apptDate);
-      const open = shop.openTime;
-      const close = shop.closeTime;
-
-      let isClosed = false;
-      if (open < close) {
-        isClosed = reqDate < open || reqDate > close;
-      } else {
-        isClosed = reqDate < open && reqDate > close;
-      }
-
-      if (isClosed) {
-        return res.status(400).json({
-          succes: false,
-          message: "the apptDate is not in the massage shop working hours",
-        });
-      }
     }
 
     appointment = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
@@ -203,6 +161,13 @@ exports.deleteAppointment = async (req, res, next) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
 
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointment with the id of ${req.params.id}`,
+      });
+    }
+
     if (
       appointment.user.toString() !== req.user.id &&
       req.user.role !== "admin"
@@ -210,13 +175,6 @@ exports.deleteAppointment = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: `User ${req.user.id} is not authorized to delete this appointment`,
-      });
-    }
-
-    if (!appointment) {
-      return res.status(404).json({
-        success: false,
-        message: `No appointment with the id of ${req.params.id}`,
       });
     }
 
