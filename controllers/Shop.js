@@ -1,10 +1,10 @@
-const Hospital = require("../models/MassageShop");
+const Shop = require("../models/Shop");
 const Appointment = require("../models/Appointment");
 
-// @desc Get all hospitals
-// @route GET /api/v1/hospitals
+// @desc Get all shops
+// @route GET /api/v1/shops
 // @access Public
-exports.getHospitals = async (req, res, nxt) => {
+exports.getShops = async (req, res, nxt) => {
   let query;
 
   const reqQuery = { ...req.query };
@@ -19,7 +19,7 @@ exports.getHospitals = async (req, res, nxt) => {
   );
 
   // Basic Filter
-  query = Hospital.find(JSON.parse(queryStr)).populate("appointments");
+  query = Shop.find(JSON.parse(queryStr)).populate("appointments");
 
   // Select
   if (req.query.select) {
@@ -44,7 +44,7 @@ exports.getHospitals = async (req, res, nxt) => {
   query = query.skip(startIndex).limit(limit);
 
   try {
-    const total = await Hospital.countDocuments();
+    const total = await Shop.countDocuments();
     const pagination = {};
     if (endIndex < total) {
       pagination.next = {
@@ -60,12 +60,12 @@ exports.getHospitals = async (req, res, nxt) => {
       };
     }
 
-    const hospitals = await query;
+    const shops = await query;
     return res.status(200).json({
       success: true,
-      count: hospitals.length,
+      count: shops.length,
       pagination,
-      data: hospitals,
+      data: shops,
     });
   } catch (err) {
     console.log(err);
@@ -73,68 +73,68 @@ exports.getHospitals = async (req, res, nxt) => {
   }
 };
 
-// @desc Get single hospital
-// @route GET /api/v1/hospitals/:id
+// @desc Get single shop
+// @route GET /api/v1/shops/:id
 // @access Public
-exports.getHospital = async (req, res, nxt) => {
+exports.getShop = async (req, res, nxt) => {
   try {
-    const hospital = await Hospital.findById(req.params.id);
-    if (!hospital) {
+    const shop = await Shop.findById(req.params.id);
+    if (!shop) {
       return res.status(400).json({ success: false });
     }
 
     return res.status(200).json({
       success: true,
-      data: hospital,
+      data: shop,
     });
   } catch (err) {
     return res.status(400).json({ success: false });
   }
 };
 
-// @desc Create a hospital
-// @route POST /api/v1/hospitals/
+// @desc Create a shop
+// @route POST /api/v1/shops/
 // @access Private
-exports.createHospital = async (req, res, nxt) => {
-  const hospital = await Hospital.create(req.body);
+exports.createShop = async (req, res, nxt) => {
+  const shop = await Shop.create(req.body);
   res.status(201).json({
     success: true,
-    data: hospital,
+    data: shop,
   });
 };
 
-// @desc Update single hospital
-// @route PUT /api/v1/hospitals/:id
+// @desc Update single shop
+// @route PUT /api/v1/shops/:id
 // @access Private
-exports.updateHospital = async (req, res, nxt) => {
+exports.updateShop = async (req, res, nxt) => {
   try {
-    const hospital = await Hospital.findByIdAndUpdate(req.params.id, req.body, {
+    const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
       new: true, // return updated document
       runValidators: true,
     });
 
-    if (!hospital) {
+    if (!shop) {
       return res.status(400).json({ success: false });
     }
 
-    return res.status(200).json({ success: true, data: hospital });
+    return res.status(200).json({ success: true, data: shop });
   } catch (err) {
     return res.status(400).json({ success: false });
   }
 };
 
-// @desc Delete single hospital
-// @route DELETE /api/v1/hospitals/:id
+// @desc Delete single shop
+// @route DELETE /api/v1/shops/:id
 // @access Private
-exports.deleteHospital = async (req, res, nxt) => {
+exports.deleteShop = async (req, res, nxt) => {
   try {
-    const hospital = await Hospital.findById(req.params.id);
-    if (!hospital) {
+    const shop = await Shop.findById(req.params.id);
+    if (!shop) {
       return res.status(400).json({ success: false });
     }
 
-    await Appointment.deleteMany({ hospital: req.params.id });
-    await Hospital.deleteOne({ _id: req.params.id });
+    await Appointment.deleteMany({ shop: req.params.id });
+    await Shop.deleteOne({ _id: req.params.id });
 
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
