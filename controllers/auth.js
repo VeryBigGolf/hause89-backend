@@ -31,6 +31,7 @@ exports.register = async (req, res, next) => {
       email,
       password,
       role,
+      tel,
     });
     sendTokenResponse(user, 200, res);
   } catch (err) {
