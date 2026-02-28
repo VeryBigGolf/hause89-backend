@@ -22,7 +22,7 @@ connectDB();
 const app = express();
 
 const auth = require("./routes/auth");
-const hospitals = require("./routes/hospitals");
+const shops = require("./routes/shops");
 const appointments = require("./routes/appointments");
 
 app.use(express.json());
@@ -64,14 +64,14 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 app.use("/api/v1/auth", auth);
-app.use("/api/v1/hospitals", hospitals);
+app.use("/api/v1/shops", shops);
 app.use("/api/v1/appointments", appointments);
 
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(
   PORT,
-  console.log(`Server running in ${process.env.NODE_ENV} mode in port ${PORT}`),
+  console.log(`Server running in ${process.env.NODE_ENV} mode in port ${PORT}`)
 );
 
 process.on("unhandledRejection", (err, promise) => {
