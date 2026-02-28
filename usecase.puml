@@ -10,9 +10,9 @@ rectangle "Massage Booking System" as MBS {
   usecase "Register" as UC_Register
   usecase "Login" as UC_Login
   usecase "Logout" as UC_Logout
-  usecase "Manage Shops" as ManageShops
   usecase "Get and Manage Appointments" as ManageAppointments
   usecase "getShop" as getShop
+  usecase "Manage Shops" as ManageShops
 }
 
 ' ensure actors flank the system
@@ -25,11 +25,12 @@ User --> UC_Logout
 User --> getShop
 User --> ManageAppointments
 
-Admin --> UC_Login
-Admin --> UC_Logout
-Admin --> getShop
-Admin --> ManageShops
-Admin --> ManageAppointments
-Admin --> UC_Register
+UC_Login <-- Admin
+UC_Logout <-- Admin
+getShop <-- Admin
+ManageShops <-- Admin
+ManageAppointments <-- Admin
+UC_Register <-- Admin
+
 ' UC_BookAppointment .> UC_ViewShops : depends on
 @enduml
