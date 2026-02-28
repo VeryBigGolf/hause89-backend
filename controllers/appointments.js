@@ -97,9 +97,20 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
+    // Assume same date but different time
     if (req.body.apptDate) {
       const reqDate = new Date(req.body.apptDate);
-      if (reqDate < shop.openTime || reqDate > shop.closeTime) {
+      const open = shop.openTime;
+      const close = shop.closeTime;
+
+      let isClosed = false;
+      if (open < close) {
+        isClosed = reqDate < open || reqDate > close;
+      } else {
+        isClosed = reqDate < open && reqDate > close;
+      }
+
+      if (isClosed) {
         return res.status(400).json({
           succes: false,
           message: "the apptDate is not in the massage shop working hours",
@@ -145,9 +156,20 @@ exports.updateAppointment = async (req, res, next) => {
       });
     }
 
+    // Assume same date but different time
     if (req.body.apptDate) {
       const reqDate = new Date(req.body.apptDate);
-      if (reqDate < shop.openTime || reqDate > shop.closeTime) {
+      const open = shop.openTime;
+      const close = shop.closeTime;
+
+      let isClosed = false;
+      if (open < close) {
+        isClosed = reqDate < open || reqDate > close;
+      } else {
+        isClosed = reqDate < open && reqDate > close;
+      }
+
+      if (isClosed) {
         return res.status(400).json({
           succes: false,
           message: "the apptDate is not in the massage shop working hours",
