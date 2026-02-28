@@ -1,0 +1,44 @@
+{
+  "name": "a-10-naxocist",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/2110503-CEDT68/a-7-naxocist#readme",
+  "bugs": {
+    "url": "https://github.com/2110503-CEDT68/a-7-naxocist/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2110503-CEDT68/a-7-naxocist.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "test1": "newman run ./test_a7_1.json",
+    "test2": "newman run ./test_a7_2.json",
+    "test": "newman run ./VacQ.postman_collection.json -e ./VacQ68.postman_environment.json -r htmlextra"
+  },
+  "dependencies": {
+    "@exortek/express-mongo-sanitize": "^1.1.1",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "express-xss-sanitizer": "^2.0.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.1",
+    "newman": "^6.2.2",
+    "newman-reporter-htmlextra": "^1.23.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "info": {
+    "_postman_id": "6412ea4d-2de4-4e4e-842a-5bf5e447713a",
+    "name": "VacQ A7-1 Fixed",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45885844",
+    "_collection_link": "https://go.postman.co/collection/45885844-6412ea4d-2de4-4e4e-842a-5bf5e447713a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "get all BKK hospitals",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"GET BKK hospitals\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.expect(pm.response.json().count).to.equal(65);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/hospitals/?province=กรุงเทพมหานคร&limit=300",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "hospitals", ""],
+          "query": [
+            {
+              "key": "province",
+              "value": "กรุงเทพมหานคร"
+            },
+            {
+              "key": "limit",
+              "value": "300"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get NG hospitals limit",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"get NG hospitals limit\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.expect(pm.response.json().count).to.equal(178);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/hospitals?province[gt]=ง&limit=300",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "hospitals"],
+          "query": [
+            {
+              "key": "province[gt]",
+              "value": "ง"
+            },
+            {
+              "key": "limit",
+              "value": "300"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get hospitals page 3 limit48",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"GET hospitals Page3\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.expect(pm.response.json().count).to.equal(48);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/hospitals/?page=3&limit=48",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "hospitals", ""],
+          "query": [
+            {
+              "key": "page",
+              "value": "3"
+            },
+            {
+              "key": "limit",
+              "value": "48"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get selected fields and sort",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"GET hospitals by name, province, and postalcode,sorted by name\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.expect(pm.response.json().data[0].name).not.to.equal(\"\");\r",
+              "    pm.expect(pm.response.json().data[0].postalcode).not.to.equal(\"\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/hospitals/?select=name,province,postalcode&sort=name",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "hospitals", ""],
+          "query": [
+            {
+              "key": "select",
+              "value": "name,province,postalcode"
+            },
+            {
+              "key": "sort",
+              "value": "name"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.environment.set(\"TOKEN\",pm.response.json().token)"],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": "JSON Type",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\":\"admin@gmail.com\",\r\n    \"password\":\"12345678\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/v1/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get all appts populate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"GET all appts\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.expect(pm.response.json().count).to.equal(6);\r",
+              "    pm.expect(pm.response.json().data[0].hospital.name).to.equal(\"ลาดพร้าว\");\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/appointments",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "appointments"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get hospitals query populate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"GET hospitals query populate\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.expect(pm.response.json().data[0].appointments[0].hospital).to.equal(\"69960f8e389cba952767fe02\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/v1/hospitals/?name=ลาดพร้าว",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "v1", "hospitals", ""],
+          "query": [
+            {
+              "key": "name",
+              "value": "ลาดพร้าว"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
