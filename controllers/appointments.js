@@ -10,19 +10,19 @@ exports.getAppointments = async (req, res, next) => {
   if (req.user.role !== "admin") {
     query = Appointment.find({ user: req.user.id }).populate({
       path: "shop",
-      select: "name province tel",
+      select: "name address tel",
     });
   } else {
     // Admin can filter by shopId
     if (req.params.shopId) {
       query = Appointment.find({ shop: req.params.shopId }).populate({
         path: "shop",
-        select: "name province tel",
+        select: "name address tel",
       });
     } else {
       query = Appointment.find().populate({
         path: "shop",
-        select: "name province tel",
+        select: "name address tel",
       });
     }
   }
@@ -51,7 +51,7 @@ exports.getAppointment = async (req, res, next) => {
   try {
     const appointment = await Appointment.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel",
+      select: "name address tel",
     });
     if (!appointment) {
       return res.status(404).json({
@@ -59,6 +59,7 @@ exports.getAppointment = async (req, res, next) => {
         message: `No appointment with the id of ${req.params.id}`,
       });
     }
+    console.log(appointment);
     return res.status(200).json({
       success: true,
       data: appointment,
