@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema({
       "Please add a valid email",
     ],
   },
+  tel: {
+    type: String,
+    required: [true, "Please add a telephone number"],
+  },
   role: {
     type: String,
     enum: ["user", "admin"],
@@ -46,7 +50,7 @@ UserSchema.methods.getSignedJwtToken = function () {
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRE,
-    },
+    }
   );
 };
 

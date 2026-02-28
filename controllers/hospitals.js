@@ -1,4 +1,4 @@
-const Hospital = require("../models/Hospital");
+const Hospital = require("../models/MassageShop");
 const Appointment = require("../models/Appointment");
 
 // @desc Get all hospitals
@@ -15,7 +15,7 @@ exports.getHospitals = async (req, res, nxt) => {
 
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
-    (match) => `$${match}`,
+    (match) => `$${match}`
   );
 
   // Basic Filter
