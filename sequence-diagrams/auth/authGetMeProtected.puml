@@ -1,0 +1,38 @@
+@startuml Auth (GET ME - PROTECTED)
+
+title "Auth (GET ME - PROTECTED)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:auth" as routerAuth
+participant "<<middleware>>\n:protect" as middlewareProtect
+participant "<<controllers>>\n:auth" as controllerAuth
+participant "<<model>>\n:User" as modelUser
+database "<<MongoDB>>\n:users" as usersDb
+
+client -> server ++ : GET /api/v1/auth/me (Bearer token)
+server -> routerAuth ++ : app.use('/api/v1/auth', auth)
+routerAuth -> middlewareProtect ++ : protect()
+
+alt token missing / null / invalid
+  middlewareProtect --> client -- : 401 Not authorize to access this route
+else token valid
+  middlewareProtect -> modelUser ++ : findById(decoded.id)
+  modelUser -> usersDb ++ : query user
+  usersDb --> modelUser -- : req.user
+  modelUser --> middlewareProtect -- : req.user
+  middlewareProtect -> controllerAuth ++ : getMe(req.user.id)
+  controllerAuth -> modelUser ++ : findById(req.user.id)
+  modelUser -> usersDb ++ : query user
+  usersDb --> modelUser -- : user
+  modelUser --> controllerAuth -- : user
+  controllerAuth --> client -- : 200 { success, data }
+end
+
+@enduml
