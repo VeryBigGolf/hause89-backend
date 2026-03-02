@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "3853fe2d-f8dc-4c04-b8c4-25df6c1e92d9",
+    "_postman_id": "9a1971e9-18eb-491a-aedb-449f7a33df8a",
     "name": "Massage Test",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "44363704",
-    "_collection_link": "https://go.postman.co/collection/44363704-3853fe2d-f8dc-4c04-b8c4-25df6c1e92d9?source=collection_link"
+    "_exporter_id": "45885844",
+    "_collection_link": "https://go.postman.co/collection/45885844-9a1971e9-18eb-491a-aedb-449f7a33df8a?source=collection_link"
   },
   "item": [
     {
@@ -95,12 +95,133 @@
             "packages": {},
             "requests": {}
           }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": "JSON Type",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"address\":\"{{$randomStreetAddress}}\",\r\n    \"tel\":\"{{$randomPhoneNumber}}\",\r\n    \"openTime\": \"{{$timestamp}}\",\r\n    \"closeTime\": \"{{$timestamp}}\"\r\n    // \"district\":\"Pakkret\",\r\n    // \"province\":\"Nonthaburi\",\r\n    // \"postalcode\":\"10110\",\r\n    // \"region\":\"กรุงเทพมหานคร (Bangkok)\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/api/v1/shops",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "shops"
+          ]
+        },
+        "description": "Fetch all hospitals from database."
+      },
+      "response": []
+    },
+    {
+      "name": "*User Register Pre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.environment.set(\"TOKEN\", pm.response.json().token)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         },
         {
           "listen": "prerequest",
           "script": {
             "exec": [
-              ""
+              "const randomEmail = `user_${Math.floor(Math.random() * 10000)}@gmail.com`;\r",
+              "\r",
+              "pm.environment.set(\"user_generated_email\", randomEmail);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": "JSON",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\": \"{{user_generated_email}}\",\r\n    \"password\": \"12345678\",\r\n    \"tel\": \"{{$randomPhoneNumber}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/api/v1/auth/register",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "*User Create Appt 1 Pre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "console.log(response.data._id);\r",
+              "\r",
+              "pm.globals.set(\"global_appt_id_pre\",response.data._id);"
             ],
             "type": "text/javascript",
             "packages": {},
@@ -130,7 +251,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"address\":\"{{$randomStreetAddress}}\",\r\n    \"tel\":\"{{$randomPhoneNumber}}\",\r\n    \"openTime\": \"{{$timestamp}}\",\r\n    \"closeTime\": \"{{$timestamp}}\"\r\n}",
+          "raw": "{\r\n    \"apptDate\": \"{{$timestamp}}\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -138,17 +259,24 @@
           }
         },
         "url": {
-          "raw": "{{URL}}/api/v1/shops",
+          "raw": "{{URL}}/api/v1/shops/:shop_ID/appointments",
           "host": [
             "{{URL}}"
           ],
           "path": [
             "api",
             "v1",
-            "shops"
+            "shops",
+            ":shop_ID",
+            "appointments"
+          ],
+          "variable": [
+            {
+              "key": "shop_ID",
+              "value": "{{global_shop_id}}"
+            }
           ]
-        },
-        "description": "Fetch all hospitals from database."
+        }
       },
       "response": []
     },
@@ -686,6 +814,57 @@
       "response": []
     },
     {
+      "name": "User Get SIngle Appts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{URL}}/api/v1/appointments/:appt_ID",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "appointments",
+            ":appt_ID"
+          ],
+          "variable": [
+            {
+              "key": "appt_ID",
+              "value": "{{global_appt_id}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "User Update Single Appt",
       "event": [
         {
@@ -753,6 +932,73 @@
       "response": []
     },
     {
+      "name": "User Update Single Appt of Pre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401\", function () {\r",
+              "    pm.response.to.have.status(401);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": "JSON",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"apptDate\": \"{{$timestamp}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/api/v1/appointments/:appt_ID_pre",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "appointments",
+            ":appt_ID_pre"
+          ],
+          "variable": [
+            {
+              "key": "appt_ID_pre",
+              "value": "{{global_appt_id_pre}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "User Delete Single Appt",
       "event": [
         {
@@ -813,6 +1059,73 @@
             {
               "key": "appt_ID",
               "value": "{{global_appt_id}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "User Delete Single Appt of Pre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401\", function () {\r",
+              "    pm.response.to.have.status(401);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": "JSON\n",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"hospital\": \"6995ebac389cba952767fccb\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/api/v1/appointments/:appt_ID_Pre",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "appointments",
+            ":appt_ID_Pre"
+          ],
+          "variable": [
+            {
+              "key": "appt_ID_Pre",
+              "value": "{{global_appt_id_pre}}"
             }
           ]
         }
@@ -910,7 +1223,7 @@
       "response": []
     },
     {
-      "name": "*Admin Create Appt",
+      "name": "*Admin User Create Appt",
       "event": [
         {
           "listen": "test",
@@ -1189,11 +1502,6 @@
     {
       "key": "GLOBAL_TOKEN",
       "value": ""
-    },
-    {
-      "key": "URL",
-      "value": "http://localhost:5000",
-      "type": "default"
     }
   ]
 }

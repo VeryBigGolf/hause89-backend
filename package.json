@@ -16,8 +16,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "test-html": "newman run ./Massage-Test.postman_collection.json -e ./Shops.postman_environment.json -r htmlextra",
-    "test": "newman run ./Massage-Test.postman_collection.json -e ./Shops.postman_environment.json"
+    "test-html": "newman run ./Massage.postman_collection.json -e ./Massage.postman_environment.json -r htmlextra",
+    "test": "newman run ./Massage.postman_collection.json -e ./Massage.postman_environment.json"
   },
   "dependencies": {
     "@exortek/express-mongo-sanitize": "^1.1.1",
