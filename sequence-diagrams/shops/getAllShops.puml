@@ -1,0 +1,27 @@
+@startuml Manage Shops (GET ALL)
+
+title "Manage Shops (GET ALL)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:shops" as routerShops
+participant "<<controllers>>\n:shops" as controllerShops
+participant "<<model>>\n:Shop" as modelShop
+database "<<MongoDB>>\n:shops" as shopsDb
+
+client -> server ++ : GET /api/v1/shops
+server -> routerShops ++ : app.use('/api/v1/shops', shops)
+routerShops -> controllerShops ++ : getShops(req.query)
+controllerShops -> modelShop ++ : find(filter).populate('appointments')
+modelShop -> shopsDb ++ : query shops collection
+shopsDb --> modelShop -- : shops[]
+modelShop --> controllerShops -- : shops[]
+controllerShops --> client -- : 200 { success, count, pagination, data }
+
+@enduml

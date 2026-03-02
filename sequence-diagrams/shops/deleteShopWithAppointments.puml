@@ -1,0 +1,60 @@
+@startuml Manage Shops (DELETE - CASCADE APPOINTMENTS)
+
+title "Manage Shops (DELETE - CASCADE APPOINTMENTS)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:shops" as routerShops
+participant "<<middleware>>\n:protect" as middlewareProtect
+participant "<<middleware>>\n:authorize(admin)" as middlewareAuthorize
+participant "<<controllers>>\n:shops" as controllerShops
+participant "<<model>>\n:User" as modelUser
+participant "<<model>>\n:Shop" as modelShop
+participant "<<model>>\n:Appointment" as modelAppointment
+database "<<MongoDB>>\n:users" as usersDb
+database "<<MongoDB>>\n:shops" as shopsDb
+database "<<MongoDB>>\n:appointments" as appointmentsDb
+
+client -> server ++ : DELETE /api/v1/shops/:id (Bearer token)
+server -> routerShops ++ : app.use('/api/v1/shops', shops)
+routerShops -> middlewareProtect ++ : protect()
+middlewareProtect -> modelUser ++ : findById(decoded.id)
+modelUser -> usersDb ++ : query user
+usersDb --> modelUser -- : user
+modelUser --> middlewareProtect -- : req.user
+
+alt token invalid or missing
+  middlewareProtect --> client -- : 401 Not authorized
+else token valid
+  middlewareProtect -> middlewareAuthorize ++ : authorize('admin')
+  alt role is not admin
+    middlewareAuthorize --> client -- : 403 Forbidden
+  else role is admin
+    middlewareAuthorize -> controllerShops ++ : deleteShop(id)
+    controllerShops -> modelShop ++ : findById(id)
+    modelShop -> shopsDb ++ : query by _id
+    shopsDb --> modelShop -- : shop | null
+
+    alt shop not found
+      modelShop --> controllerShops -- : null
+      controllerShops --> client -- : 400 { success: false }
+    else shop found
+      modelShop --> controllerShops -- : shop
+      controllerShops -> modelAppointment ++ : deleteMany({ shop: id })
+      modelAppointment -> appointmentsDb ++ : delete related docs
+      appointmentsDb --> modelAppointment -- : deleted
+      controllerShops -> modelShop ++ : deleteOne({ _id: id })
+      modelShop -> shopsDb ++ : delete by _id
+      shopsDb --> modelShop -- : deleted
+      controllerShops --> client -- : 200 { success, data: {} }
+    end
+  end
+end
+
+@enduml

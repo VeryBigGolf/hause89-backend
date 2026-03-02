@@ -1,0 +1,33 @@
+@startuml Manage Shops (GET ONE)
+
+title "Manage Shops (GET ONE)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:shops" as routerShops
+participant "<<controllers>>\n:shops" as controllerShops
+participant "<<model>>\n:Shop" as modelShop
+database "<<MongoDB>>\n:shops" as shopsDb
+
+client -> server ++ : GET /api/v1/shops/:id
+server -> routerShops ++ : app.use('/api/v1/shops', shops)
+routerShops -> controllerShops ++ : getShop(req.params.id)
+controllerShops -> modelShop ++ : findById(id)
+modelShop -> shopsDb ++ : query by _id
+shopsDb --> modelShop -- : shop | null
+
+alt shop found
+  modelShop --> controllerShops -- : shop
+  controllerShops --> client -- : 200 { success, data }
+else shop not found
+  modelShop --> controllerShops -- : null
+  controllerShops --> client -- : 400 { success: false }
+end
+
+@enduml
