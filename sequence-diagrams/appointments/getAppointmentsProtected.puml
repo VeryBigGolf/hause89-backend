@@ -1,0 +1,52 @@
+@startuml Appointments (GET ALL - PROTECTED)
+
+title "Appointments (GET ALL - PROTECTED)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:appointments" as routerAppointments
+participant "<<middleware>>\n:protect" as middlewareProtect
+participant "<<controllers>>\n:appointments" as controllerAppointments
+participant "<<model>>\n:User" as modelUser
+participant "<<model>>\n:Appointment" as modelAppointment
+database "<<MongoDB>>\n:users" as usersDb
+database "<<MongoDB>>\n:appointments" as appointmentsDb
+
+client -> server ++ : GET /api/v1/appointments (Bearer token)
+server -> routerAppointments ++ : app.use('/api/v1/appointments', appointments)
+routerAppointments -> middlewareProtect ++ : protect()
+
+alt token missing / invalid
+  middlewareProtect --> client -- : 401 Not authorize to access this route
+else token valid
+  middlewareProtect -> modelUser ++ : findById(decoded.id)
+  modelUser -> usersDb ++ : query user
+  usersDb --> modelUser -- : req.user
+  modelUser --> middlewareProtect -- : req.user
+  middlewareProtect -> controllerAppointments ++ : getAppointments(req.user, req.params.shopId)
+
+  alt req.user.role is not admin
+    controllerAppointments -> modelAppointment ++ : find({ user: req.user.id }).populate(shop)
+    modelAppointment -> appointmentsDb ++ : query by user
+  else req.user.role is admin
+    alt req.params.shopId exists
+      controllerAppointments -> modelAppointment ++ : find({ shop: req.params.shopId }).populate(shop)
+      modelAppointment -> appointmentsDb ++ : query by shop
+    else no req.params.shopId
+      controllerAppointments -> modelAppointment ++ : find().populate(shop)
+      modelAppointment -> appointmentsDb ++ : query all
+    end
+  end
+
+  appointmentsDb --> modelAppointment -- : appointments[]
+  modelAppointment --> controllerAppointments -- : appointments[]
+  controllerAppointments --> client -- : 200 { success, count, data }
+end
+
+@enduml

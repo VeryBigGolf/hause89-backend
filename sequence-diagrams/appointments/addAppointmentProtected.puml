@@ -1,0 +1,69 @@
+@startuml Appointments (POST - PROTECTED)
+
+title "Appointments (POST - PROTECTED)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:shops" as routerShops
+participant "<<router>>\n:appointments" as routerAppointments
+participant "<<middleware>>\n:protect" as middlewareProtect
+participant "<<middleware>>\n:authorize(admin,user)" as middlewareAuthorize
+participant "<<controllers>>\n:appointments" as controllerAppointments
+participant "<<model>>\n:User" as modelUser
+participant "<<model>>\n:Appointment" as modelAppointment
+participant "<<model>>\n:Shop" as modelShop
+database "<<MongoDB>>\n:users" as usersDb
+database "<<MongoDB>>\n:appointments" as appointmentsDb
+database "<<MongoDB>>\n:shops" as shopsDb
+
+client -> server ++ : POST /api/v1/shops/:shopId/appointments (Bearer token)
+server -> routerShops ++ : app.use('/api/v1/shops', shops)
+routerShops -> routerAppointments ++ : use('/:shopId/appointments', appointmentRouter)
+routerAppointments -> middlewareProtect ++ : protect()
+middlewareProtect -> modelUser ++ : findById(decoded.id)
+modelUser -> usersDb ++ : query user
+usersDb --> modelUser -- : user
+modelUser --> middlewareProtect -- : req.user
+
+alt token invalid or missing
+  middlewareProtect --> client -- : 401 Not authorized
+else token valid
+  middlewareProtect -> middlewareAuthorize ++ : authorize('admin','user')
+  alt role not allowed
+    middlewareAuthorize --> client -- : 403 Forbidden
+  else role allowed
+    middlewareAuthorize -> controllerAppointments ++ : addAppointment(shopId, body)
+    controllerAppointments -> modelAppointment ++ : find({ user: req.user.id })
+    modelAppointment -> appointmentsDb ++ : query user appointments
+    appointmentsDb --> modelAppointment -- : existing[]
+
+    alt user reached 3 appointments and not admin
+      modelAppointment --> controllerAppointments -- : existing[]
+      controllerAppointments --> client -- : 400 limit reached
+    else can continue
+      controllerAppointments -> modelShop ++ : findById(shopId)
+      modelShop -> shopsDb ++ : query by _id
+      shopsDb --> modelShop -- : shop | null
+
+      alt shop not found
+        modelShop --> controllerAppointments -- : null
+        controllerAppointments --> client -- : 404 shop not found
+      else shop found
+        modelShop --> controllerAppointments -- : shop
+        controllerAppointments -> modelAppointment ++ : create({ ...body, user, shop })
+        modelAppointment -> appointmentsDb ++ : insert appointment
+        appointmentsDb --> modelAppointment -- : appointment
+        modelAppointment --> controllerAppointments -- : appointment
+        controllerAppointments --> client -- : 200 { success, data }
+      end
+    end
+  end
+end
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml Appointments (GET ONE - PROTECTED)
+
+title "Appointments (GET ONE - PROTECTED)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:appointments" as routerAppointments
+participant "<<middleware>>\n:protect" as middlewareProtect
+participant "<<controllers>>\n:appointments" as controllerAppointments
+participant "<<model>>\n:User" as modelUser
+participant "<<model>>\n:Appointment" as modelAppointment
+database "<<MongoDB>>\n:users" as usersDb
+database "<<MongoDB>>\n:appointments" as appointmentsDb
+
+client -> server ++ : GET /api/v1/appointments/:id (Bearer token)
+server -> routerAppointments ++ : app.use('/api/v1/appointments', appointments)
+routerAppointments -> middlewareProtect ++ : protect()
+
+alt token missing / invalid
+  middlewareProtect --> client -- : 401 Not authorize to access this route
+else token valid
+  middlewareProtect -> modelUser ++ : findById(decoded.id)
+  modelUser -> usersDb ++ : query user
+  usersDb --> modelUser -- : req.user
+  modelUser --> middlewareProtect -- : req.user
+  middlewareProtect -> controllerAppointments ++ : getAppointment(req.params.id)
+  controllerAppointments -> modelAppointment ++ : findById(id).populate(shop)
+  modelAppointment -> appointmentsDb ++ : query by _id
+  appointmentsDb --> modelAppointment -- : appointment | null
+
+  alt appointment found
+    modelAppointment --> controllerAppointments -- : appointment
+    controllerAppointments --> client -- : 200 { success, data }
+  else appointment not found
+    modelAppointment --> controllerAppointments -- : null
+    controllerAppointments --> client -- : 404 { success: false, message }
+  end
+end
+
+@enduml

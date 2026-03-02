@@ -1,0 +1,61 @@
+@startuml Appointments (PUT - PROTECTED)
+
+title "Appointments (PUT - PROTECTED)"
+header Sequence Diagram — be-project-68-hause89
+footer Page %page% of %lastpage%
+autonumber
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:appointments" as routerAppointments
+participant "<<middleware>>\n:protect" as middlewareProtect
+participant "<<middleware>>\n:authorize(admin,user)" as middlewareAuthorize
+participant "<<controllers>>\n:appointments" as controllerAppointments
+participant "<<model>>\n:User" as modelUser
+participant "<<model>>\n:Appointment" as modelAppointment
+database "<<MongoDB>>\n:users" as usersDb
+database "<<MongoDB>>\n:appointments" as appointmentsDb
+
+client -> server ++ : PUT /api/v1/appointments/:id (Bearer token)
+server -> routerAppointments ++ : app.use('/api/v1/appointments', appointments)
+routerAppointments -> middlewareProtect ++ : protect()
+
+alt token missing / invalid
+  middlewareProtect --> client -- : 401 Not authorize to access this route
+else token valid
+  middlewareProtect -> modelUser ++ : findById(decoded.id)
+  modelUser -> usersDb ++ : query user
+  usersDb --> modelUser -- : req.user
+  modelUser --> middlewareProtect -- : req.user
+  middlewareProtect -> middlewareAuthorize ++ : authorize('admin','user')
+
+  alt role not allowed
+    middlewareAuthorize --> client -- : 403 Forbidden
+  else role allowed
+    middlewareAuthorize -> controllerAppointments ++ : updateAppointment(id, body)
+    controllerAppointments -> modelAppointment ++ : findById(id)
+    modelAppointment -> appointmentsDb ++ : query by _id
+    appointmentsDb --> modelAppointment -- : appointment | null
+
+    alt appointment not found
+      modelAppointment --> controllerAppointments -- : null
+      controllerAppointments --> client -- : 404 { success: false, message }
+    else appointment found
+      modelAppointment --> controllerAppointments -- : appointment
+      alt not owner and not admin
+        controllerAppointments --> client -- : 401 not authorized to update
+      else owner or admin
+        controllerAppointments -> modelAppointment ++ : findByIdAndUpdate(id, body)
+        modelAppointment -> appointmentsDb ++ : update by _id
+        appointmentsDb --> modelAppointment -- : updated appointment
+        modelAppointment --> controllerAppointments -- : updated appointment
+        controllerAppointments --> client -- : 200 { success, data }
+      end
+    end
+  end
+end
+
+@enduml
