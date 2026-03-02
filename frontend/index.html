@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><title>Massage Shop</title><link rel="stylesheet" href="style.css"/></head>
+<body>
+
+<!-- Auth -->
+<div id="pg-auth">
+  <div id="f-login">
+    <h2>Login</h2>
+    <input id="l-em" placeholder="Email"/><br>
+    <input id="l-pw" type="password" placeholder="Password"/><br>
+    <button onclick="doLogin()">Login</button>
+    <p>No account? <a href="#" onclick="showRegister()">Register</a></p>
+  </div>
+  <div id="f-reg" class="hide">
+    <h2>Register</h2>
+    <input id="r-nm" placeholder="Name"/><br>
+    <input id="r-em" placeholder="Email"/><br>
+    <input id="r-pw" type="password" placeholder="Password"/><br>
+    <input id="r-tel" placeholder="Tel"/><br>
+    <select id="r-role"><option value="user">User</option><option value="admin">Admin</option></select><br>
+    <button onclick="doRegister()">Register</button>
+    <p>Have account? <a href="#" onclick="showLogin()">Login</a></p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="pg-app" class="hide">
+  <b id="uname"></b> <button onclick="doLogout()">Logout</button>
+  <hr>
+  <button onclick="nav('appointments')">My Appointments</button>
+  <button id="nav-shops" onclick="nav('shops')">Manage Shops</button>
+  <hr>
+
+  <!-- Appointments -->
+  <div id="v-appointments">
+    <h3>My Appointments <button onclick="openBook()">+ Book</button></h3>
+    <table><thead><tr><th>Shop</th><th>Address</th><th>Tel</th><th>Date</th><th>Actions</th></tr></thead><tbody id="atb"></tbody></table>
+  </div>
+
+  <!-- Shops (admin) -->
+  <div id="v-shops" class="hide">
+    <h3>All Shops <button onclick="openCS()">+ Add Shop</button></h3>
+    <table><thead><tr><th>Name</th><th>Address</th><th>Tel</th><th>Open</th><th>Close</th><th>Actions</th></tr></thead><tbody id="stb"></tbody></table>
+  </div>
+</div>
+
+<!-- Dialog: Book -->
+<dialog id="dlg-bk">
+  <div id="bk1"><h3>Pick a Shop</h3><ul id="slist"></ul></div>
+  <div id="bk2" class="hide">
+    <h3>Date for <b id="bk-snm"></b></h3><input type="hidden" id="bk-sid"/>
+    <input type="datetime-local" id="bk-dt"/><br>
+    <button onclick="confirmBook()">Book</button>
+    <button onclick="$('bk1').classList.remove('hide');$('bk2').classList.add('hide')">Back</button>
+  </div>
+  <button onclick="$('dlg-bk').close()">Cancel</button>
+</dialog>
+
+<!-- Dialog: Edit Appointment -->
+<dialog id="dlg-ea">
+  <h3>Edit Appointment</h3><input type="hidden" id="ea-id"/>
+  <input type="datetime-local" id="ea-dt"/><br>
+  <button onclick="saveAppt()">Save</button> <button onclick="$('dlg-ea').close()">Cancel</button>
+</dialog>
+
+<!-- Dialog: Create Shop -->
+<dialog id="dlg-cs">
+  <h3>Add Shop</h3>
+  <input id="cs-nm" placeholder="Name"/><br><input id="cs-ad" placeholder="Address"/><br>
+  <input id="cs-tel" placeholder="Tel"/><br>
+  <input type="datetime-local" id="cs-op"/> Open<br><input type="datetime-local" id="cs-cl"/> Close<br>
+  <button onclick="saveCS()">Create</button> <button onclick="$('dlg-cs').close()">Cancel</button>
+</dialog>
+
+<!-- Dialog: Edit Shop -->
+<dialog id="dlg-es">
+  <h3>Edit Shop</h3><input type="hidden" id="es-id"/>
+  <input id="es-nm" placeholder="Name"/><br><input id="es-ad" placeholder="Address"/><br><input id="es-tel" placeholder="Tel"/><br>
+  <button onclick="saveES()">Save</button> <button onclick="$('dlg-es').close()">Cancel</button>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
