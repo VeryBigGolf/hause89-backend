@@ -1,0 +1,129 @@
+@startuml Backend Class Diagram
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "Bootstrap" {
+  class Server {
+    +configureEnv()
+    +connectDB()
+    +configureMiddlewares()
+    +mountRoutes()
+    +start()
+  }
+
+  class DbConfig {
+    +connectDB()
+  }
+}
+
+package "Middleware" {
+  class AuthMiddleware <<Control>> {
+    +protect(req,res,next)
+    +authorize(...roles)
+  }
+}
+
+package "Routes" {
+  class AuthRoute <<Boundary>> {
+    +POST /register
+    +POST /login
+    +GET /me
+    +GET /logout
+  }
+
+  class ShopRoute <<Boundary>> {
+    +GET /
+    +POST /
+    +GET /:id
+    +PUT /:id
+    +DELETE /:id
+  }
+
+  class AppointmentRoute <<Boundary>> {
+    +GET /
+    +POST /
+    +GET /:id
+    +PUT /:id
+    +DELETE /:id
+  }
+}
+
+package "Controllers" {
+  class AuthController <<Control>> {
+    +register(req,res,next)
+    +login(req,res,next)
+    +getMe(req,res,next)
+    +logout(req,res,next)
+    -sendTokenResponse(user,statusCode,res)
+  }
+
+  class ShopController <<Control>> {
+    +getShops(req,res,next)
+    +getShop(req,res,next)
+    +createShop(req,res,next)
+    +updateShop(req,res,next)
+    +deleteShop(req,res,next)
+  }
+
+  class AppointmentController <<Control>> {
+    +getAppointments(req,res,next)
+    +getAppointment(req,res,next)
+    +addAppointment(req,res,next)
+    +updateAppointment(req,res,next)
+    +deleteAppointment(req,res,next)
+  }
+}
+
+package "Models" {
+  class User <<Entity>> {
+    +name: String
+    +email: String
+    +tel: String
+    +role: String
+    +password: String
+    +createdAt: Date
+    +getSignedJwtToken(): String
+    +matchPassword(enteredPassword): Boolean
+  }
+
+  class Shop <<Entity>> {
+    +name: String
+    +address: String
+    +tel: String
+    +openTime: Date
+    +closeTime: Date
+  }
+
+  class Appointment <<Entity>> {
+    +apptDate: Date
+    +createdAt: Date
+    +user: ObjectId
+    +shop: ObjectId
+  }
+}
+
+Server ..> DbConfig : uses
+Server ..> AuthRoute : mounts
+Server ..> ShopRoute : mounts
+Server ..> AppointmentRoute : mounts
+
+AuthRoute ..> AuthController : delegates
+ShopRoute ..> ShopController : delegates
+AppointmentRoute ..> AppointmentController : delegates
+
+AuthRoute ..> AuthMiddleware : protect
+ShopRoute ..> AuthMiddleware : protect/authorize
+AppointmentRoute ..> AuthMiddleware : protect/authorize
+
+AuthController ..> User : uses
+ShopController ..> Shop : uses
+ShopController ..> Appointment : cascade delete
+AppointmentController ..> Appointment : uses
+AppointmentController ..> Shop : validates
+AuthMiddleware ..> User : resolves req.user
+
+User "1" <-- "0..*" Appointment : bookedBy
+Shop "1" <-- "0..*" Appointment : at
+Shop "1" o-- "0..*" Appointment : virtual appointments
+
+@enduml
