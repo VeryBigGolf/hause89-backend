@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <!-- Dialog: Book -->
+    <!-- Dialog Book -->
     <dialog id="dlg-bk">
       <div id="bk1">
         <h3>Pick a Shop</h3>
@@ -87,26 +87,26 @@
         <button onclick="confirmBook()">Book</button>
         <button
           onclick="
-            $('bk1').classList.remove('hide');
-            $('bk2').classList.add('hide');
+            getTagById('bk1').classList.remove('hide');
+            getTagById('bk2').classList.add('hide');
           "
         >
           Back
         </button>
       </div>
-      <button onclick="$('dlg-bk').close()">Cancel</button>
+      <button onclick="getTagById('dlg-bk').close()">Cancel</button>
     </dialog>
 
-    <!-- Dialog: Edit Appointment -->
+    <!-- Dialog Edit Appointment -->
     <dialog id="dlg-ea">
       <h3>Edit Appointment</h3>
       <input type="hidden" id="ea-id" />
       <input type="datetime-local" id="ea-dt" /><br />
       <button onclick="saveAppt()">Save</button>
-      <button onclick="$('dlg-ea').close()">Cancel</button>
+      <button onclick="getTagById('dlg-ea').close()">Cancel</button>
     </dialog>
 
-    <!-- Dialog: Create Shop -->
+    <!-- Dialog Create Shop -->
     <dialog id="dlg-cs">
       <h3>Add Shop</h3>
       <input id="cs-nm" placeholder="Name" /><br /><input
@@ -120,10 +120,10 @@
       />
       Close<br />
       <button onclick="saveCS()">Create</button>
-      <button onclick="$('dlg-cs').close()">Cancel</button>
+      <button onclick="getTagById('dlg-cs').close()">Cancel</button>
     </dialog>
 
-    <!-- Dialog: Edit Shop -->
+    <!-- Dialog Edit Shop -->
     <dialog id="dlg-es">
       <h3>Edit Shop</h3>
       <input type="hidden" id="es-id" />
@@ -132,7 +132,7 @@
         placeholder="Address"
       /><br /><input id="es-tel" placeholder="Tel" /><br />
       <button onclick="saveES()">Save</button>
-      <button onclick="$('dlg-es').close()">Cancel</button>
+      <button onclick="getTagById('dlg-es').close()">Cancel</button>
     </dialog>
 
     <script src="app.js"></script>
