@@ -14,6 +14,11 @@ const call = async (m, p, b) => {
   return (await fetch(API + p, o)).json();
 };
 const dateFmt = (d) => (d ? new Date(d).toLocaleString() : "-");
+const timeFmt = (d) =>
+  d
+    ? new Date(d).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "-";
+const toStaticDt = (t) => (t ? "2026-01-01T" + t : "");
 
 // Auth
 async function doLogin() {
@@ -96,7 +101,7 @@ async function loadAppts() {
 <td>${s.name || a.shop || "-"}</td>
 <td>${s.address || "-"}</td>
 <td>${s.tel || "-"}</td>
-<td>${dateFmt(a.apptDate)}</td>
+<td>${timeFmt(a.apptDate)}</td>
 <td><button onclick="editAppt('${a._id}','${a.apptDate || ""}')">Edit</button> <button onclick="delAppt('${a._id}')">Del</button></td>
 </tr>`;
     })
@@ -107,14 +112,15 @@ async function delAppt(id) {
   await call("DELETE", "/appointments/" + id);
   loadAppts();
 }
+
 function editAppt(id, dt) {
   getTagById("ea-id").value = id;
-  getTagById("ea-dt").value = dt ? dt.substring(0, 16) : "";
+  getTagById("ea-dt").value = dt ? dt.substring(11, 16) : "";
   getTagById("dlg-ea").showModal();
 }
 async function saveAppt() {
   const d = await call("PUT", "/appointments/" + getTagById("ea-id").value, {
-    apptDate: getTagById("ea-dt").value,
+    apptDate: toStaticDt(getTagById("ea-dt").value),
   });
   getTagById("dlg-ea").close();
   if (d.success) loadAppts();
@@ -149,7 +155,7 @@ async function confirmBook() {
   const d = await call(
     "POST",
     "/shops/" + getTagById("bk-sid").value + "/appointments",
-    { apptDate: getTagById("bk-dt").value }
+    { apptDate: toStaticDt(getTagById("bk-dt").value) }
   );
   getTagById("dlg-bk").close();
   if (d.success) loadAppts();
@@ -171,10 +177,10 @@ async function loadShops() {
 <td>${s.name}</td>
 <td>${s.address || "-"}</td>
 <td>${s.tel || "-"}</td>
-<td>${dateFmt(s.openTime)}</td>
-<td>${dateFmt(s.closeTime)}</td>
+<td>${timeFmt(s.openTime)}</td>
+<td>${timeFmt(s.closeTime)}</td>
 <td>
-<button onclick="editShopDlg('${s._id}','${s.name.replace(/'/g, "\\'")}','${(s.address || "").replace(/'/g, "\\'")}','${s.tel || ""}')">Edit</button>
+<button onclick="editShopDlg('${s._id}','${s.name.replace(/'/g, "\\'")}','${(s.address || "").replace(/'/g, "\\'")}','${s.tel || ""}','${s.openTime || ""}','${s.closeTime || ""}')">Edit</button>
 <button onclick="delShop('${s._id}')">Del</button></td>
 </tr>`
     )
@@ -200,28 +206,34 @@ async function saveCS() {
     o = getTagById("cs-op").value,
     c = getTagById("cs-cl").value;
   if (t) b.tel = t;
-  if (o) b.openTime = o;
-  if (c) b.closeTime = c;
+  if (o) b.openTime = toStaticDt(o);
+  if (c) b.closeTime = toStaticDt(c);
   const d = await call("POST", "/shops", b);
   getTagById("dlg-cs").close();
   if (d.success) loadShops();
   else alert("Failed");
 }
-function editShopDlg(id, n, a, t) {
+function editShopDlg(id, n, a, t, o, c) {
   getTagById("es-id").value = id;
   getTagById("es-nm").value = n;
   getTagById("es-ad").value = a;
   getTagById("es-tel").value = t;
+  getTagById("es-op").value = o ? o.substring(11, 16) : "";
+  getTagById("es-cl").value = c ? c.substring(11, 16) : "";
   getTagById("dlg-es").showModal();
 }
 async function saveES() {
   const b = {};
   const n = getTagById("es-nm").value,
     a = getTagById("es-ad").value,
-    t = getTagById("es-tel").value;
+    t = getTagById("es-tel").value,
+    o = getTagById("es-op").value,
+    c = getTagById("es-cl").value;
   if (n) b.name = n;
   if (a) b.address = a;
   if (t) b.tel = t;
+  if (o) b.openTime = toStaticDt(o);
+  if (c) b.closeTime = toStaticDt(c);
   const d = await call("PUT", "/shops/" + getTagById("es-id").value, b);
   getTagById("dlg-es").close();
   if (d.success) loadShops();

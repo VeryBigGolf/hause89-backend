@@ -83,7 +83,7 @@
       <div id="bk2" class="hide">
         <h3>Date for <b id="bk-snm"></b></h3>
         <input type="hidden" id="bk-sid" />
-        <input type="datetime-local" id="bk-dt" /><br />
+        <input type="time" id="bk-dt" /><br />
         <button onclick="confirmBook()">Book</button>
         <button
           onclick="
@@ -101,7 +101,7 @@
     <dialog id="dlg-ea">
       <h3>Edit Appointment</h3>
       <input type="hidden" id="ea-id" />
-      <input type="datetime-local" id="ea-dt" /><br />
+      <input type="time" id="ea-dt" /><br />
       <button onclick="saveAppt()">Save</button>
       <button onclick="getTagById('dlg-ea').close()">Cancel</button>
     </dialog>
@@ -114,11 +114,8 @@
         placeholder="Address"
       /><br />
       <input id="cs-tel" placeholder="Tel" /><br />
-      <input type="datetime-local" id="cs-op" /> Open<br /><input
-        type="datetime-local"
-        id="cs-cl"
-      />
-      Close<br />
+      <input type="time" id="cs-op" /> Open<br />
+      <input type="time" id="cs-cl" /> Close<br />
       <button onclick="saveCS()">Create</button>
       <button onclick="getTagById('dlg-cs').close()">Cancel</button>
     </dialog>
@@ -131,6 +128,8 @@
         id="es-ad"
         placeholder="Address"
       /><br /><input id="es-tel" placeholder="Tel" /><br />
+      <input type="time" id="es-op" /> Open<br />
+      <input type="time" id="es-cl" /> Close<br />
       <button onclick="saveES()">Save</button>
       <button onclick="getTagById('dlg-es').close()">Cancel</button>
     </dialog>
