@@ -140,13 +140,15 @@ async function openBook() {
   getTagById("slist").innerHTML = d.data
     .map(
       (s) =>
-        `<li><button onclick="pickShop('${s._id}','${s.name.replace(/'/g, "\\'")}')">${s.name}</button> ${s.address || ""} ${s.tel || ""}</li>`
+        `<li><button onclick="pickShop('${s._id}','${s.name.replace(/'/g, "\\'")}','${s.openTime || ""}','${s.closeTime || ""}')">${s.name}</button> ${s.address || ""} ${s.tel || ""}</li>`
     )
     .join("");
 }
-function pickShop(id, nm) {
+function pickShop(id, nm, o, c) {
   getTagById("bk-sid").value = id;
   getTagById("bk-snm").textContent = nm;
+  getTagById("bk-hours").textContent =
+    o || c ? timeFmt(o) + " - " + timeFmt(c) : "";
   getTagById("bk1").classList.add("hide");
   getTagById("bk2").classList.remove("hide");
   getTagById("bk-dt").value = "";
