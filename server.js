@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 const mongoSanitize = require("@exortek/express-mongo-sanitize");
 const helmet = require("helmet");
 const { xss } = require("express-xss-sanitizer");
-const rateLimit = require("express-rate-limit");
+// const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const cors = require("cors");
 
@@ -32,12 +32,12 @@ app.use(helmet());
 app.use(xss());
 app.use(cors());
 
-const limiter = rateLimit({
-  // 5 mins / 100 requests
-  windowMs: 5 * 60 * 1000,
-  max: 100,
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   // 5 mins / 100 requests
+//   windowMs: 5 * 60 * 1000,
+//   max: 100,
+// });
+// app.use(limiter);
 
 app.use(hpp());
 
