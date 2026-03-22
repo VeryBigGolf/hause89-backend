@@ -8,22 +8,28 @@ exports.getAppointments = async (req, res, next) => {
   let query;
 
   if (req.user.role !== "admin") {
-    query = Appointment.find({ user: req.user.id }).populate({
-      path: "shop",
-      select: "name address tel",
-    });
+    query = Appointment.find({ user: req.user.id })
+      .populate({
+        path: "shop",
+        select: "name address tel",
+      })
+      .populate("user", "name email");
   } else {
     // Admin can filter by shopId
     if (req.params.shopId) {
-      query = Appointment.find({ shop: req.params.shopId }).populate({
-        path: "shop",
-        select: "name address tel",
-      });
+      query = Appointment.find({ shop: req.params.shopId })
+        .populate({
+          path: "shop",
+          select: "name address tel",
+        })
+        .populate("user", "name email");
     } else {
-      query = Appointment.find().populate({
-        path: "shop",
-        select: "name address tel",
-      });
+      query = Appointment.find()
+        .populate({
+          path: "shop",
+          select: "name address tel",
+        })
+        .populate("user", "name email");
     }
   }
 
