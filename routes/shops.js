@@ -9,7 +9,7 @@ const {
   createShop,
   updateShop,
   deleteShop,
-} = require("../controllers/shops");
+} = require("../controllers/Shops");
 
 const appointmentRouter = require("./appointments");
 router.use("/:shopId/appointments", appointmentRouter);
